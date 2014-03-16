@@ -16,13 +16,106 @@ Uses the alp library from https://github.com/phyllisstein/alp; thanks Daniel!
 import json
 import datetime
 import os.path
-import datetime
 import locale
+import sys
 
 import alp
 
+DEBUG = False
+
+
+def debug_print(text):
+    if DEBUG:
+        print text
+
+
+def new_walk_budget(data, category):
+    """
+    New algorithm:
+      Walk all available months
+        If an amount is budgeted, add to running total
+        Play all the transactions in that category for that month
+        If at the end the balance is negative:
+          If overspendingHandling is null, reset balance to 0
+          If overspendingHandling is "confined", keep balance
+    """
+    budget = 0
+    saved_budget = None
+    now = datetime.date.today()
+
+    for month in data["monthlyBudgets"]:
+        Y = int(month["month"][0:4])
+        M = int(month["month"][5:7])
+        budget_month = datetime.date(Y, M, 1)
+        if budget_month > now:
+            # Now we've reached the future so time to stop
+            debug_print("Reached the future")
+            if not saved_budget == None and budget == 0:
+                budget = saved_budget
+            break
+        debug_print("")
+        debug_print("Starting %s with budget of %0.2f" % (month["month"], budget))
+        budget += get_monthly_budget(month["monthlySubCategoryBudgets"], category)
+        debug_print("Budgeted amount for %s is %0.2f" %(month["month"], budget))
+        budget += play_monthly_transactions(data, month["month"][0:7], category)
+        debug_print("Ended month with balance of %0.2f" % budget)
+        if budget < 0:
+            debug_print("Category is overspent for this month!")
+            if not ("overspendingHandling" in month) or not (month["overspendingHandling"] == "confined"):
+                debug_print("Resetting balance to 0")
+                saved_budget = budget
+                budget = 0
+
+    debug_print("Finished walking budget, balance is %0.2f" % budget)
+    return budget
+
+
+def play_monthly_transactions(data, month, categoryId):
+    """
+    Play all the transactions in a category for a month, including
+    split transactions. Return the total of those transactions.
+    """
+    balance = 0
+    found_data = False
+    try:
+        transactions = data["transactions"]
+        for transaction in transactions:
+            this_month = transaction["date"][0:7]
+            if this_month == month:
+                if transaction["categoryId"] == "Category/__Split__":
+                    for sub_transaction in transaction["subTransactions"]:
+                        if sub_transaction["categoryId"] == categoryId and not "isTombstone" in sub_transaction:
+                            balance += sub_transaction["amount"]
+                            debug_print("  Found split transaction %s (%s)" % (sub_transaction["amount"], balance))
+                else:
+                    if transaction["categoryId"] == categoryId and not "isTombstone" in transaction:
+                        balance += transaction["amount"]
+                        debug_print("  Found transaction %s (%s)" % (transaction["amount"], balance))
+    except Exception, e:
+        debug_print(e)
+        handle_error("Error finding budget balance", "", "icon-no.png", e)
+        debug_print("oh no")
+
+    debug_print("Monthly spend for this category is %0.2f" % balance)
+
+    return balance
+
+
+def get_monthly_budget(data, category):
+    """
+    Find the amount allocated to a category for a month.
+    """
+    for subcategory in data:
+        if subcategory["categoryId"] == category:
+            return subcategory["budgeted"]
+    return 0
+
 
 def handle_error(title, subtitle, icon = "icon-no.png", debug = ""):
+    """
+    Output an error message in a form suitable for Alfred to show something.
+    Send the error and any debug info supplied to the log file.
+    """
     i = alp.Item(title = title, subtitle = subtitle, icon = icon)
     alp.feedback(i)
     alp.log("Handled error: %s, %s\n%s" % (title, subtitle, debug))
@@ -30,6 +123,10 @@ def handle_error(title, subtitle, icon = "icon-no.png", debug = ""):
 
 
 def find_budget(path):
+    """
+    Given a path (to a YNAB budget bundle) load the meta data and try to 
+    find a datafile with full knowledge we can work from.
+    """
     # Look in the ymeta file to find our data directory
     try:
         fh = open(os.path.join(path, "Budget.ymeta"), "r")
@@ -64,6 +161,9 @@ def find_budget(path):
 
 
 def load_budget(path):
+    """
+    Load a budget file in to memory.
+    """
     try:
         fp = open(os.path.join(path, "Budget.yfull"), "r")
         data = json.load(fp)
@@ -77,6 +177,10 @@ def load_budget(path):
 
 
 def get_currency_symbol(data):
+    """
+    Try to guess the currency symbol for this budget file based on its
+    locale.
+    """
     try:
         currency_locale = data["budgetMetaData"]["currencyLocale"]
         locale.setlocale(locale.LC_ALL, locale.normalize(currency_locale))
@@ -85,6 +189,9 @@ def get_currency_symbol(data):
 
 
 def all_categories(data):
+    """
+    Find all the categories in a budget file.
+    """
     all = []
     try:
         master_categories = data["masterCategories"]
@@ -104,6 +211,9 @@ def all_categories(data):
 
 
 def find_category(data, category_name):
+    """
+    Locate a particular category and return the ID for it.
+    """
     entityId = ""
     try:
         master_categories = data["masterCategories"]
@@ -127,48 +237,10 @@ def find_category(data, category_name):
     return entityId
 
 
-def find_budgeted(data, entityId):
-    budgeted = 0
-    try:
-        monthly_budgets = data["monthlyBudgets"]
-        monthly_budgets = sorted(monthly_budgets, key=lambda k: k["month"])
-        now = datetime.date.today()
-        for budget in monthly_budgets:
-            year = int(budget["month"][0:4])
-            month = int(budget["month"][5:7])
-            budget_month = datetime.date(year, month, 1)
-            if budget_month > now:
-                # Now we've reached the future so time to stop
-                break
-            subcategory_budgets = budget["monthlySubCategoryBudgets"]
-            for subcategory_budget in subcategory_budgets:
-                if subcategory_budget["categoryId"] == entityId:
-                    budgeted += subcategory_budget["budgeted"]
-    except Exception, e:
-        handle_error("Error finding budget value", "", "icon-no.png", e)
-
-    return budgeted
-
-
-def walk_transactions(data, categoryId, balance):
-    try:
-        transactions = data["transactions"]
-        for transaction in transactions:
-            # Check for subtransactions
-            if transaction["categoryId"] == "Category/__Split__":
-                for sub_transaction in transaction["subTransactions"]:
-                    if sub_transaction["categoryId"] == categoryId and not "isTombstone" in sub_transaction:
-                        balance += sub_transaction["amount"]
-            else:
-                if transaction["categoryId"] == categoryId and not "isTombstone" in transaction:
-                    balance += transaction["amount"]
-    except Exception, e:
-        handle_error("Error finding budget balance", "", "icon-no.png", e)
-
-    return balance
-
-
 def check_for_budget(path):
+    """
+    Look in a folder to see if it contains a budget we can use.
+    """
     result_path = ""
     if os.path.exists(path):
         sub_folders = os.listdir(path)
@@ -203,6 +275,7 @@ if __name__ == "__main__":
         handle_error("Unable to guess budget location", "Use Alfred's File Action on your budget file to configure", "icon-no.png")
 
     # Load data
+    debug_print(path)
     data = load_budget(path)
     get_currency_symbol(data)
 
@@ -219,11 +292,7 @@ if __name__ == "__main__":
         if entityId == "":
             pass
         else:
-            # Find the starting balance of our category
-            starting_balance = find_budgeted(data, entityId)
-
-            # Replay the transactions
-            ending_balance = walk_transactions(data, entityId, starting_balance)
+            ending_balance = new_walk_budget(data, entityId)
 
             if ending_balance == None:
                 ending_balance = 0
