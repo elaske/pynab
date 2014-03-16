@@ -18,6 +18,7 @@ import datetime
 import os.path
 import locale
 import sys
+import argparse
 import logging
 
 def debug_print(text):
@@ -267,9 +268,34 @@ def check_for_budget(path):
     return result_path
 
 
-if __name__ == "__main__":   
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--logfile', dest='logfile', default='', help='Specify a log file to log info to.')
+    parser.add_argument('--loglevel', dest='loglevel', default='', help='Specify a logging level to output.')
+    args = parser.parse_args()
+
+    # Logging configuration args
+    logConfigArgs = dict()
+    # If the log level was specified 
+    if args.loglevel:
+        # Convert it to something usable
+        numeric_level = getattr(logging, args.loglevel.upper(), None)
+        # Double-check it's a valid logging level
+        if not isinstance(numeric_level, int):
+            raise ValueError('Invalid log level: %s' % args.loglevel)
+        logConfigArgs['level'] = numeric_level
+    # If there was any of the logging files specified...
+    if args.logfile:
+        logConfigArgs['filename'] = args.logfile
+        # This will make the log file be overwritten each time.
+        logConfigArgs['filemode'] = 'w'
+
+    # If any of the logging arguments are specified, configure logging
+    if args.logfile or args.loglevel:
+        logging.basicConfig(**logConfigArgs)
+
     path = ''
-    
+
     # If we have a setting for the location, use that
     if not path == "":
         path = find_budget(path)
