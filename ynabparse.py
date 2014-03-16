@@ -270,8 +270,8 @@ def check_for_budget(path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--logfile', dest='logfile', default='', help='Specify a log file to log info to.')
-    parser.add_argument('--loglevel', dest='loglevel', default='', help='Specify a logging level to output.')
+    parser.add_argument('--logfile', dest='logfile', default='debug.log', help='Specify a log file to log info to.')
+    parser.add_argument('--loglevel', dest='loglevel', default='debug', help='Specify a logging level to output.')
     args = parser.parse_args()
 
     # Logging configuration args
@@ -314,9 +314,10 @@ if __name__ == "__main__":
         handle_error("Unable to guess budget location", "Use Alfred's File Action on your budget file to configure", "icon-no.png")
 
     # Load data
-    debug_print(path)
+    debug_print('path = {0}'.format(path))
     data = load_budget(path)
     get_currency_symbol(data)
+    debug_print('data = {0}'.format(json.dumps(data, indent=4)))
 
     all = all_categories(data)
-    debug_print(all)
+    debug_print('all = {0}'.format(json.dumps(all, indent=4)))
