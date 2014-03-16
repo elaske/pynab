@@ -20,8 +20,6 @@ import locale
 import sys
 import logging
 
-import alp
-
 def debug_print(text):
     logging.debug(text)
 
@@ -270,9 +268,9 @@ def check_for_budget(path):
 
 
 if __name__ == "__main__":   
+    path = ''
+    
     # If we have a setting for the location, use that
-    s = alp.Settings()
-    path = s.get("budget_path", "")
     if not path == "":
         path = find_budget(path)
 
@@ -295,38 +293,4 @@ if __name__ == "__main__":
     get_currency_symbol(data)
 
     all = all_categories(data)
-    query = alp.args()[0]
-    results = alp.fuzzy_search(query, all, key = lambda x: '%s' % x["name"])
-
-    items = []
-
-    for r in results:
-        # Find category ID matching our requirement
-        entityId = r["entityId"]
-
-        if entityId == "":
-            pass
-        else:
-            ending_balance = new_walk_budget(data, entityId)
-
-            if ending_balance == None:
-                ending_balance = 0
-
-            if ending_balance < 0:
-                ending_text = "Overspent on %s this month!"
-                icon = "icon-no.png"
-            elif ending_balance == 0:
-                ending_text = "No budget left for %s this month"
-                icon = "icon-no.png"
-            else:
-                ending_text = "Remaining balance for %s this month"
-                icon = "icon-yes.png"
-            try:
-                i = alp.Item(title=locale.currency(ending_balance, True, True).decode("latin1"), subtitle = ending_text % r["name"], uid = entityId, valid = False, icon = icon)
-            except Exception, e:
-                i = alp.Item(title="%0.2f" % ending_balance, subtitle = ending_text % r["name"], uid = entityId, valid = False, icon = icon)
-            items.append(i)
-
-    alp.feedback(items)
-
-    
+    debug_print(all)
