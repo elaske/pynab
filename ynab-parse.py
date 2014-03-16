@@ -18,15 +18,12 @@ import datetime
 import os.path
 import locale
 import sys
+import logging
 
 import alp
 
-DEBUG = False
-
-
 def debug_print(text):
-    if DEBUG:
-        print text
+    logging.debug(text)
 
 
 def new_walk_budget(data, category):
