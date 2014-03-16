@@ -43,7 +43,11 @@ def new_walk_budget(data, category):
     saved_budget = None
     now = datetime.date.today()
 
-    for month in data["monthlyBudgets"]:
+    debug_print("-- Starting walk_budget for %s" % category)
+
+    monthly_budgets = sorted(data["monthlyBudgets"], key=lambda k: k["month"])
+
+    for month in monthly_budgets:
         Y = int(month["month"][0:4])
         M = int(month["month"][5:7])
         budget_month = datetime.date(Y, M, 1)
@@ -61,7 +65,9 @@ def new_walk_budget(data, category):
         debug_print("Ended month with balance of %0.2f" % budget)
         if budget < 0:
             debug_print("Category is overspent for this month!")
-            if not ("overspendingHandling" in month) or not (month["overspendingHandling"] == "confined"):
+            osh = get_overspending_handling(month["monthlySubCategoryBudgets"], category)
+
+            if not osh == None and (not osh.lower() == "confined"):
                 debug_print("Resetting balance to 0")
                 saved_budget = budget
                 budget = 0
@@ -109,6 +115,18 @@ def get_monthly_budget(data, category):
         if subcategory["categoryId"] == category:
             return subcategory["budgeted"]
     return 0
+
+def get_overspending_handling(data, category):
+    """
+    Find the overspendingHandling for a category in a month
+    """
+    for subcategory in data:
+        if subcategory["categoryId"] == category:
+            if "overspendingHandling" in subcategory:
+                return subcategory["overspendingHandling"]
+            else:
+                return None
+    return None
 
 
 def handle_error(title, subtitle, icon = "icon-no.png", debug = ""):
