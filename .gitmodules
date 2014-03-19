@@ -1,0 +1,3 @@
+[submodule "ynab-sample"]
+	path = ynab-sample
+	url = https://github.com/elaske/ynab-sample.git
