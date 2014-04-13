@@ -1,49 +1,50 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Pynab by elaske</title>
+    <head>
+        <meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+        <title>Pynab README</title>
+	    <link rel="stylesheet" href="stylesheets/styles.css">
+	    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+	    <script src="javascripts/scale.fix.js"></script>
+	    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	    <!--[if lt IE 9]>
+	    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
+    </head>
+    <body>
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-</head>
-<body>
-    <div class="wrapper">
-        <header>
-            <h1 class="header">Pynab</h1>
-            <p class="header">Python interface to YNAB database.</p>
-            <ul>
-                <li class="download"><a class="buttons" href="https://github.com/elaske/pynab/zipball/master">Download ZIP</a></li>
-                <li class="download"><a class="buttons" href="https://github.com/elaske/pynab/tarball/master">Download TAR</a></li>
-                <li><a class="buttons github" href="https://github.com/elaske/pynab">View On GitHub</a></li>
-            </ul>
-            <p class="header">This project is maintained by <a class="header name" href="https://github.com/elaske">elaske</a></p>
-        </header>
-        <section>
-            <h2><a name="what-is-pynab" class="anchor" href="#what-is-pynab"><span class="octicon octicon-link"></span></a>What is Pynab?</h2>
-            <p>Pynab is a Python interface to the YNAB4 (You Need A Budget v4) database. The purpose is to give an interface for other scripts to use to analyze or automate some tasks that would otherwise be time-consuming. This would also give users the ability to add some features, theoretically, to YNAB.</p>
-            <h2><a name="history" class="anchor" href="#history"><span class="octicon octicon-link"></span></a>History</h2>
-            <p>This project started as a fork of James Seward's alfred-ynab Alfred 2 module, <a href="https://github.com/jamesoff/alfred-ynab">https://github.com/jamesoff/alfred-ynab</a>. He included a YNAB parser for the purposes of finding the remaining budget balances for the Alfred workflow.</p>
-            <p>This was only a read-only interface, and I wanted to create an interface that would allow for writing to the database. This would enable the automation of transaction entry, tracking investments by increase / decrease transactions, etc.</p>
-            <h2><a name="development" class="anchor" href="#development"><span class="octicon octicon-link"></span></a>Development</h2>
-            <p>The <a href="https://github.com/elaske/pynab/wiki">wiki</a> for this project will house any information relevant to development or use. During development, I plan to store any information I find from reverse-engineering the YNAB database in the wiki. Also, eventually, this will be where the information as to how to use this library will be located.</p>
-            <h2><a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
-            <p>The original interface was licensed BSD. Whilst this remains in the repository in any form, I will be licensing this in BSD as well.</p>
-            <h2><a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
-            <p>If anyone has any interest in contributing, please contact me. You can suggest a feature by adding an issue if you so desire as well.</p>
-            <p><strong>Disclaimer:</strong> I am but a lone contributor and can only work on this in my spare free time. The day job does get in the way of things like this. So, I make no guarantees as to the timeliness of completion, etc.</p>
-        </section>
-        <footer>
-            <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
-        </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+        <div class="wrapper">
+    <header>
+        <h1 class="header">Pynab</h1>
+        <p class="header">Python interface to YNAB database.</p>
+        <ul>
+            <li class="download"><a class="buttons" href="https://github.com/elaske/pynab/zipball/master">Download ZIP</a></li>
+            <li class="download"><a class="buttons" href="https://github.com/elaske/pynab/tarball/master">Download TAR</a></li>
+            <li><a class="buttons github" href="https://github.com/elaske/pynab">View On GitHub</a></li>
+        </ul>
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/elaske">elaske</a></p>
+    </header>
+    <section>
+        <h2><a name="what-is-pynab" class="anchor" href="#what-is-pynab"><span class="octicon octicon-link"></span></a>What is Pynab?</h2>
+        <p>Pynab is a Python interface to the YNAB4 (You Need A Budget v4) database. The purpose is to give an interface for other scripts to use to analyze or automate some tasks that would otherwise be time-consuming. This would also give users the ability to add some features, theoretically, to YNAB.</p>
+        <h2><a name="history" class="anchor" href="#history"><span class="octicon octicon-link"></span></a>History</h2>
+        <p>This project started as a fork of James Seward's alfred-ynab Alfred 2 module, <a href="https://github.com/jamesoff/alfred-ynab">https://github.com/jamesoff/alfred-ynab</a>. He included a YNAB parser for the purposes of finding the remaining budget balances for the Alfred workflow.</p>
+        <p>This was only a read-only interface, and I wanted to create an interface that would allow for writing to the database. This would enable the automation of transaction entry, tracking investments by increase / decrease transactions, etc.</p>
+        <h2><a name="development" class="anchor" href="#development"><span class="octicon octicon-link"></span></a>Development</h2>
+        <p>The <a href="https://github.com/elaske/pynab/wiki">wiki</a> for this project will house any information relevant to development or use. During development, I plan to store any information I find from reverse-engineering the YNAB database in the wiki. Also, eventually, this will be where the information as to how to use this library will be located.</p>
+        <h2><a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+        <p>The original interface was licensed BSD. Whilst this remains in the repository in any form, I will be licensing this in BSD as well.</p>
+        <h2><a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+        <p>If anyone has any interest in contributing, please contact me. You can suggest a feature by adding an issue if you so desire as well.</p>
+        <p><strong>Disclaimer:</strong> I am but a lone contributor and can only work on this in my spare free time. The day job does get in the way of things like this. So, I make no guarantees as to the timeliness of completion, etc.</p>
+    </section>
+    <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+    </footer>
+</div>
+<!--[if !IE]><script>fixScale(document);</script><![endif]-->
 
-</body>
+
+    </body>
 </html>
